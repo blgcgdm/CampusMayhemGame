@@ -148,7 +148,6 @@ public static class DemoSceneValidator
         if (states.Length == 1)
         {
             Require(states[0].matchDuration > 0f, "matchDuration sifir veya negatif");
-            Require(states[0].assistWindow > 0f, "assistWindow sifir veya negatif");
         }
 
         var skins = roots.SelectMany(r => r.GetComponentsInChildren<MatchHudSkin>(true)).ToArray();

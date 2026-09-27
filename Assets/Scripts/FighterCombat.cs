@@ -19,10 +19,6 @@ public class FighterCombat : MonoBehaviour
 
     public bool IsStunned { get { return Time.time < stunnedUntil; } }
 
-
-    public FighterCombat LastAttacker { get; private set; }
-    public float LastHitTime { get; private set; }
-
     private Rigidbody2D body;
     private float stunnedUntil;
     private float invulnerableUntil;
@@ -46,32 +42,24 @@ public class FighterCombat : MonoBehaviour
             FighterCombat target = hit.GetComponentInParent<FighterCombat>();
             if (target == null || target == this) continue;
 
-            target.TakeHit(this, facing);
+            target.TakeHit(facing);
         }
 
         return true;
     }
 
-    public void TakeHit(FighterCombat attacker, int attackerFacing)
+    public void TakeHit(int attackerFacing)
     {
         if (Time.time < invulnerableUntil) return;
 
         invulnerableUntil = Time.time + invulnerability;
         stunnedUntil = Time.time + stunDuration;
 
-        LastAttacker = attacker;
-        LastHitTime = Time.time;
 
         Vector2 push = new Vector2(attackerFacing < 0 ? -1f : 1f, knockbackLift).normalized * knockbackForce;
         if (push.magnitude > maxKnockbackSpeed) push = push.normalized * maxKnockbackSpeed;
 
         body.linearVelocity = push;
-    }
-
-    public void ClearAttribution()
-    {
-        LastAttacker = null;
-        LastHitTime = 0f;
     }
 
     public void ClearStun()

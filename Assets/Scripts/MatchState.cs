@@ -10,10 +10,6 @@ public class MatchState : MonoBehaviour
     [Header("Süre")]
     public float matchDuration = 45f;
 
-    [Header("Atıf")]
-
-    public float assistWindow = 5f;
-
     public float TimeLeft { get; private set; }
     public bool IsRunning { get; private set; }
 
@@ -50,21 +46,15 @@ public class MatchState : MonoBehaviour
         return scores.TryGetValue(playerIndex, out score) ? score : 0;
     }
 
+    // Haritadan dusen kim olursa olsun rakip puan alir. Iki kisilik bir
+    // oyunda "rakip" zaten tek kisi, o yuzden son-vuran takibine gerek yok;
+    // kendi hatanla dusmek de rakibe yariyor.
     public void ReportRingOut(Fighter victim)
     {
         if (!IsRunning) return;
 
-        var hurt = victim.GetComponent<FighterCombat>();
-        if (hurt == null || hurt.LastAttacker == null) return;
-        if (Time.time - hurt.LastHitTime > assistWindow) return;
-
-        var scorer = hurt.LastAttacker.GetComponent<Fighter>();
-        if (scorer == null || scorer == victim) return;
-
-        scores[scorer.playerIndex] = ScoreOf(scorer.playerIndex) + 1;
-
-        // Ayni vurus ikinci bir dususu puanlamasin.
-        hurt.ClearAttribution();
+        int opponent = victim.playerIndex == 1 ? 2 : 1;
+        scores[opponent] = ScoreOf(opponent) + 1;
     }
 
     public string ResultText()
