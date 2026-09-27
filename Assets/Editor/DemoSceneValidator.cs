@@ -50,6 +50,62 @@ public static class DemoSceneValidator
         else Debug.LogError("DEMO_VALIDATE_FAILED: " + failures.Count + " ihlal");
     }
 
+    // Tek sahne yerine akisin tamami: menu 0. sirada mi, havuzda harita
+    // var mi, her harita oynanabilir mi, silinen MatchHud'dan missing
+    // script kalmis mi.
+    [MenuItem("GameJam/Oyun Akisini Dogrula")]
+    public static void ValidateFlow()
+    {
+        failures.Clear();
+
+        var scenes = EditorBuildSettings.scenes.Where(s => s.enabled).ToArray();
+
+        if (scenes.Length == 0) { Report(); return; }
+
+        Require(scenes[0].path == "Assets/Boot.unity",
+                "Build Settings 0. sirasi " + scenes[0].path + ", Boot.unity olmali");
+        Require(scenes.Any(e => e.path == "Assets/MainMenu.unity"), "MainMenu Build Settings'te yok");
+        Require(scenes.Count(e => e.path.Contains("/Map")) >= 1, "Havuzda hic harita yok");
+
+        foreach (var entry in scenes)
+        {
+            Require(System.IO.File.Exists(entry.path), "Build Settings'te olmayan sahne: " + entry.path);
+        }
+
+        foreach (var entry in scenes.Where(e => e.path.Contains("/Map") && System.IO.File.Exists(e.path)))
+        {
+            Scene map = EditorSceneManager.OpenScene(entry.path, OpenSceneMode.Single);
+            string name = System.IO.Path.GetFileNameWithoutExtension(entry.path);
+            GameObject[] roots = map.GetRootGameObjects();
+
+            CheckNoMissingScripts(roots);
+            Require(roots.SelectMany(r => r.GetComponentsInChildren<Fighter>(true)).Count() == 2, name + ": 2 Fighter olmali");
+            Require(roots.SelectMany(r => r.GetComponentsInChildren<MatchState>(true)).Any(), name + ": MatchState yok");
+            Require(roots.SelectMany(r => r.GetComponentsInChildren<MatchHudSkin>(true)).Any(), name + ": MatchHudSkin yok");
+        }
+
+        Scene menu = EditorSceneManager.OpenScene("Assets/MainMenu.unity", OpenSceneMode.Single);
+        GameObject[] menuRoots = menu.GetRootGameObjects();
+        CheckNoMissingScripts(menuRoots);
+        Require(menuRoots.SelectMany(r => r.GetComponentsInChildren<MainMenu>(true)).Any(), "Menu sahnesinde MainMenu bileseni yok");
+
+        Report();
+    }
+
+    public static void ValidateFlowFromCLI()
+    {
+        ValidateFlow();
+        EditorApplication.Exit(failures.Count == 0 ? 0 : 1);
+    }
+
+    static void Report()
+    {
+        foreach (string failure in failures) Debug.LogError("VALIDATE FAIL: " + failure);
+
+        if (failures.Count == 0) Debug.Log("FLOW_VALIDATE_OK");
+        else Debug.LogError("FLOW_VALIDATE_FAILED: " + failures.Count + " ihlal");
+    }
+
     public static void ValidateFromCLI()
     {
         Validate();
@@ -95,23 +151,23 @@ public static class DemoSceneValidator
             Require(states[0].assistWindow > 0f, "assistWindow sifir veya negatif");
         }
 
-        var huds = roots.SelectMany(r => r.GetComponentsInChildren<MatchHud>(true)).ToArray();
-        Require(huds.Length == 1, "Sahnede " + huds.Length + " MatchHud var, 1 olmali");
-        if (huds.Length != 1) return;
+        var skins = roots.SelectMany(r => r.GetComponentsInChildren<MatchHudSkin>(true)).ToArray();
+        Require(skins.Length == 1, "Sahnede " + skins.Length + " MatchHudSkin var, 1 olmali");
+        if (skins.Length != 1) return;
 
-        MatchHud hud = huds[0];
-        Require(hud.timerText != null, "MatchHud.timerText bagli degil");
-        Require(hud.scoreText != null, "MatchHud.scoreText bagli degil");
-        Require(hud.resultText != null, "MatchHud.resultText bagli degil");
+        MatchHudSkin skin = skins[0];
+        Require(skin.hudRoot != null, "MatchHudSkin.hudRoot bagli degil");
+        Require(skin.timerText != null, "MatchHudSkin.timerText bagli degil");
+        Require(skin.endScreen != null, "MatchHudSkin.endScreen bagli degil");
+        Require(skin.winnerText != null, "MatchHudSkin.winnerText bagli degil");
+        Require(skin.goldMedal != null && skin.silverMedal != null, "MatchHudSkin madalya sprite'lari bagli degil");
 
-        if (hud.gameOverPanel == null) { Fail("MatchHud.gameOverPanel bagli degil"); return; }
-
-        // Panel acik kaydedilirse oyun game over ekraniyla basliyor.
-        Require(!hud.gameOverPanel.activeSelf, "gameOverPanel sahnede acik kaydedilmis, kapali olmali");
-
-        // Yeniden baslatma LoadScene kullaniyor, sahne Build Settings'te olmali.
-        Require(EditorBuildSettings.scenes.Any(s => s.path == ScenePath && s.enabled),
-                "DemoScene Build Settings'te degil, R ile yeniden baslatma calismaz");
+        for (int i = 0; i < 2; i++)
+        {
+            Require(skin.scoreTexts.Length > i && skin.scoreTexts[i] != null, "MatchHudSkin.scoreTexts[" + i + "] bagli degil");
+            Require(skin.rowTexts.Length > i && skin.rowTexts[i] != null, "MatchHudSkin.rowTexts[" + i + "] bagli degil");
+            Require(skin.rowMedals.Length > i && skin.rowMedals[i] != null, "MatchHudSkin.rowMedals[" + i + "] bagli degil");
+        }
     }
 
     // Bildirilen bug tam olarak buydu: tek bir eksene iki karakter
@@ -211,6 +267,25 @@ public static class DemoSceneValidator
             Require(root.GetComponentsInChildren<Sensor_HeroKnight>(true).Length == 0, "Sensor_HeroKnight kaldi");
             Require(root.GetComponentsInChildren<Sensor_Bandit>(true).Length == 0, "Sensor_Bandit kaldi");
         }
+    }
+
+    static void CheckNoMissingScripts(GameObject[] roots)
+    {
+        foreach (GameObject root in roots)
+        {
+            foreach (Transform t in root.GetComponentsInChildren<Transform>(true))
+            {
+                int missing = t.GetComponents<Component>().Count(c => c == null);
+                if (missing > 0) Fail(missing + " adet missing script: " + PathOf(t));
+            }
+        }
+    }
+
+    static string PathOf(Transform t)
+    {
+        string path = t.name;
+        for (Transform p = t.parent; p != null; p = p.parent) path = p.name + "/" + path;
+        return path;
     }
 
     static void Require(bool condition, string message)

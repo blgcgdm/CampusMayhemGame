@@ -6,11 +6,11 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/Arena.unity
-    guid: 4e7213e5e24ae4a1a8d2ce04426d6763
+    path: Assets/Boot.unity
+    guid: d2f3a8328d26a4160b4acd221553877b
   - enabled: 1
-    path: Assets/Scenes/DemoScene.unity
-    guid: 13729c9cbc80943ef9e24d9853ea7fac
+    path: Assets/MainMenu.unity
+    guid: e26036ac5cfa748bd91fcc64d7f56054
   - enabled: 1
     path: Assets/Scenes/Map1.unity
     guid: d0cddd19472d48d0974747c8c7e0ee6f
@@ -25,6 +25,6 @@ EditorBuildSettings:
     guid: 87e3f583f1bc043e7b4560b5d4727c11
   - enabled: 1
     path: Assets/Scenes/Map5.unity
-    guid: 8f07db2019f234e048012aabc5640b16
+    guid: 344012523f47e4c43a78432d5a46e2f9
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
