@@ -16,7 +16,6 @@ public class HeroKnight : MonoBehaviour {
     private Sensor_HeroKnight   m_wallSensorR2;
     private Sensor_HeroKnight   m_wallSensorL1;
     private Sensor_HeroKnight   m_wallSensorL2;
-    private PlayerAttack        m_playerAttack; // YENİ: knockback durumunu kontrol etmek için
     private bool                m_isWallSliding = false;
     private bool                m_grounded = false;
     private bool                m_rolling = false;
@@ -38,18 +37,11 @@ public class HeroKnight : MonoBehaviour {
         m_wallSensorR2 = transform.Find("WallSensor_R2").GetComponent<Sensor_HeroKnight>();
         m_wallSensorL1 = transform.Find("WallSensor_L1").GetComponent<Sensor_HeroKnight>();
         m_wallSensorL2 = transform.Find("WallSensor_L2").GetComponent<Sensor_HeroKnight>();
-        m_playerAttack = GetComponent<PlayerAttack>(); // YENİ
     }
 
    
     void Update ()
     {
-        
-        if (m_playerAttack != null && m_playerAttack.isPlayerKnockedOut)
-        {
-            return;
-        }
-
         
         m_timeSinceAttack += Time.deltaTime;
 
@@ -129,10 +121,6 @@ public class HeroKnight : MonoBehaviour {
 
             // Call one of three attack animations "Attack1", "Attack2", "Attack3"
             m_animator.SetTrigger("Attack" + m_currentAttack);
-
-            // Hitbox animasyonla aynı girdiden ve aynı cooldown'dan sürülüyor.
-            if (m_playerAttack != null)
-                m_playerAttack.Attack(m_facingDirection);
 
             // Reset timer
             m_timeSinceAttack = 0.0f;
