@@ -1,5 +1,6 @@
 using UnityEngine;
 
+[RequireComponent(typeof(Rigidbody2D))]
 public class EnemyAI : MonoBehaviour
 {
     public float moveSpeed = 3f;
@@ -12,6 +13,8 @@ public class EnemyAI : MonoBehaviour
 
     [Header("Zıplama Ayarı")]
     public float wallCheckDistance = 0.6f;
+    public float wallCheckHeight = 0.5f; // Ayak hizasindan atilan isin zeminin yan yuzunu siyirip
+                                         // surekli "duvar var" diyordu, isini yukari kaldir.
     public float groundCheckDistance = 2f;
     public LayerMask groundLayer;
 
@@ -30,7 +33,7 @@ public class EnemyAI : MonoBehaviour
     private bool isKnockedOut = false;
     private float knockbackEndTime = 0f;
 
-    void Start()
+    void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
@@ -69,7 +72,8 @@ public class EnemyAI : MonoBehaviour
         bool playerAbove = player.position.y > transform.position.y + 0.8f;
 
         float moveDir = Mathf.Sign(player.position.x - transform.position.x);
-        RaycastHit2D wallHit = Physics2D.Raycast(transform.position, new Vector2(moveDir, 0), wallCheckDistance, groundLayer);
+        Vector2 wallRayOrigin = (Vector2)transform.position + Vector2.up * wallCheckHeight;
+        RaycastHit2D wallHit = Physics2D.Raycast(wallRayOrigin, new Vector2(moveDir, 0), wallCheckDistance, groundLayer);
         bool wallAhead = wallHit.collider != null;
 
         if (isGrounded && (playerAbove || wallAhead) && Time.time > lastJumpTime + jumpCooldown)
@@ -89,7 +93,7 @@ public class EnemyAI : MonoBehaviour
         
         if (isKnockedOut) return;
 
-        if (player != null && rb != null)
+        if (player != null)
         {
             float distX = player.position.x - transform.position.x;
 

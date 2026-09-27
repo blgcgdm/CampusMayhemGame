@@ -130,6 +130,10 @@ public class HeroKnight : MonoBehaviour {
             // Call one of three attack animations "Attack1", "Attack2", "Attack3"
             m_animator.SetTrigger("Attack" + m_currentAttack);
 
+            // Hitbox animasyonla aynı girdiden ve aynı cooldown'dan sürülüyor.
+            if (m_playerAttack != null)
+                m_playerAttack.Attack(m_facingDirection);
+
             // Reset timer
             m_timeSinceAttack = 0.0f;
         }

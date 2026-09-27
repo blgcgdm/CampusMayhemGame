@@ -1,129 +1,75 @@
 using UnityEngine;
 using System.Collections;
 
+// Oyuncunun sadece dövüş tarafı. Hareket, zıplama ve zemin kontrolü
+// HeroKnight.cs'in işi; ikisi birden linearVelocity yazarsa çakışırlar.
+[RequireComponent(typeof(Rigidbody2D))]
 public class PlayerAttack : MonoBehaviour
 {
-    [Header("Hareket Ayarları")]
-    public float moveSpeed = 8f;
-    public float jumpForce = 12f;
-    private Rigidbody2D rb;
-    private float horizontalInput;
-
     [Header("Savrulma (Knockback) Durumu")]
     public bool isPlayerKnockedOut = false;
+    public float knockoutDuration = 0.3f;
 
     [Header("Saldırı Ayarları")]
-    public Transform attackPoint;
+    public Vector2 attackOffset = new Vector2(0.6f, 0f);
     public float attackRange = 0.8f;
     public LayerMask enemyLayers;
     public float knockbackForce = 8f;
 
-    [Header("Zemin Kontrolü")]
-    public Transform groundCheck;
-    public float groundCheckRadius = 0.2f;
-    public LayerMask groundLayer;
-    private bool isGrounded;
+    private Rigidbody2D rb;
 
-    void Start()
+    void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
     }
 
-    void Update()
+    // HeroKnight saldırı animasyonunu tetiklediği anda çağırır.
+    // Girdi tek yerde okunsun diye burada Input'a bakılmıyor.
+    public void Attack(int facingDirection)
     {
-        
-        if (isPlayerKnockedOut) return;
+        Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(AttackCenter(facingDirection), attackRange, enemyLayers);
 
-        horizontalInput = Input.GetAxisRaw("Horizontal");
-
-        if (Input.GetButtonDown("Jump") && isGrounded)
+        foreach (Collider2D hit in hitEnemies)
         {
-            Jump();
-        }
+            Enemy enemy = hit.GetComponent<Enemy>();
+            if (enemy == null) continue;
 
-        
-        if (Input.GetButtonDown("Fire1"))
-        {
-            Attack();
+            float pushX = hit.transform.position.x - transform.position.x;
+            Vector2 knockbackDir = new Vector2(pushX, 0.5f).normalized;
+
+            enemy.TakeHit(knockbackDir, knockbackForce);
         }
     }
 
-    void FixedUpdate()
-    {
-        
-        if (groundCheck != null)
-        {
-            isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
-        }
-        else
-        {
-            isGrounded = Mathf.Abs(rb.linearVelocity.y) < 0.05f; 
-        }
-
-        
-        if (isPlayerKnockedOut) return;
-
-        if (rb != null)
-        {
-            rb.linearVelocity = new Vector2(horizontalInput * moveSpeed, rb.linearVelocity.y);
-        }
-    }
-
-    void Jump()
-    {
-        rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
-    }
-
-    void Attack()
-    {
-        if (attackPoint == null) return;
-
-        Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(attackPoint.position, attackRange, enemyLayers);
-
-        foreach (Collider2D enemy in hitEnemies)
-        {
-            Enemy e = enemy.GetComponent<Enemy>();
-            if (e != null)
-            {
-                Vector2 knockbackDir = (enemy.transform.position - transform.position).normalized;
-                knockbackDir.y = 0.5f;
-
-                e.TakeHit(knockbackDir, knockbackForce);
-            }
-        }
-    }
-
-    
     public void TakeHit(Vector2 forceVector)
     {
+        // Üst üste binen coroutine'ler isPlayerKnockedOut üzerinde yarışır
+        // ve ilk biten bayrağı erken kapatır.
+        if (isPlayerKnockedOut) return;
+
         StartCoroutine(PlayerKnockbackRoutine(forceVector));
     }
 
     private IEnumerator PlayerKnockbackRoutine(Vector2 force)
     {
         isPlayerKnockedOut = true;
+        rb.linearVelocity = force;
 
-        if (rb != null)
-        {
-            
-            rb.linearVelocity = force;
-        }
-
-        yield return new WaitForSeconds(0.3f);
+        yield return new WaitForSeconds(knockoutDuration);
 
         isPlayerKnockedOut = false;
     }
 
+    private Vector2 AttackCenter(int facingDirection)
+    {
+        float x = attackOffset.x * (facingDirection < 0 ? -1f : 1f);
+        return (Vector2)transform.position + new Vector2(x, attackOffset.y);
+    }
+
     void OnDrawGizmosSelected()
     {
-        if (attackPoint == null) return;
         Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(attackPoint.position, attackRange);
-
-        if (groundCheck != null)
-        {
-            Gizmos.color = Color.green;
-            Gizmos.DrawWireSphere(groundCheck.position, groundCheckRadius);
-        }
+        Gizmos.DrawWireSphere(AttackCenter(1), attackRange);
+        Gizmos.DrawWireSphere(AttackCenter(-1), attackRange);
     }
 }

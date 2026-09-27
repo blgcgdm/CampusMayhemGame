@@ -1,5 +1,7 @@
 using UnityEngine;
 
+[RequireComponent(typeof(Rigidbody2D))]
+[RequireComponent(typeof(EnemyAI))]
 public class Enemy : MonoBehaviour
 {
     public int scoreValue = 10;
@@ -11,11 +13,14 @@ public class Enemy : MonoBehaviour
     [Header("Vuruş Dokunulmazlığı")]
     public float hitInvulnerabilityDuration = 0.4f; // Savrulma sırasında tekrar vurulamasın
 
+    [Header("Ring-out")]
+    public float deathHeight = -10f;
+
     private Rigidbody2D rb;
     private EnemyAI enemyAI;
     private float invulnerableUntil = 0f;
 
-    void Start()
+    void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         enemyAI = GetComponent<EnemyAI>();
@@ -23,7 +28,7 @@ public class Enemy : MonoBehaviour
 
     void Update()
     {
-        if (transform.position.y < -10f)
+        if (transform.position.y < deathHeight)
         {
             Die();
         }
@@ -40,24 +45,15 @@ public class Enemy : MonoBehaviour
 
         invulnerableUntil = Time.time + hitInvulnerabilityDuration;
 
-        if (rb != null)
+        Vector2 knockbackVelocity = knockbackDirection * force;
+
+        if (knockbackVelocity.magnitude > maxKnockbackSpeed)
         {
-            
-            Vector2 knockbackVelocity = knockbackDirection * force;
-
-            if (knockbackVelocity.magnitude > maxKnockbackSpeed)
-            {
-                knockbackVelocity = knockbackVelocity.normalized * maxKnockbackSpeed;
-            }
-
-            rb.linearVelocity = knockbackVelocity;
+            knockbackVelocity = knockbackVelocity.normalized * maxKnockbackSpeed;
         }
 
-        
-        if (enemyAI != null)
-        {
-            enemyAI.Stun(knockoutDuration);
-        }
+        rb.linearVelocity = knockbackVelocity;
+        enemyAI.Stun(knockoutDuration);
     }
 
     void Die()
