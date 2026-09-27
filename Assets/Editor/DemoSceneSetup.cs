@@ -1,13 +1,11 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using TMPro;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.Tilemaps;
-using UnityEngine.UI;
 
 // DemoScene'i iki oyunculu hale getirir. Sahneyi sıfırdan ÜRETMEZ:
 // tilemap elle boyanmış, onu yeniden üretmek emeği silerdi. Sadece
@@ -31,7 +29,6 @@ public static class DemoSceneSetup
         }
     }
     const string FrictionlessPath = "Assets/Settings/Frictionless.physicsMaterial2D";
-    const int UiLayer = 5;
     const int FighterLayer = 8;
     const int GroundLayer = 0;
 
@@ -246,6 +243,8 @@ public static class DemoSceneSetup
 
     // HUD her koşuda sıfırdan kurulur; yeniden çalıştırmak ikinci bir
     // Canvas üretmesin diye eskisi önce siliniyor.
+    // HUD artik MatchHudSkin; onu ScoreUIBuilder kuruyor. Burada sadece
+    // MatchState kaliyor, eski sade HUD objesi de temizleniyor.
     static void BuildMatch(Scene scene)
     {
         Destroy(Find(scene, "HUD"));
@@ -254,70 +253,10 @@ public static class DemoSceneSetup
         var matchGo = new GameObject("Match");
         SceneManager.MoveGameObjectToScene(matchGo, scene);
         matchGo.AddComponent<MatchState>();
-
-        var canvasGo = new GameObject("HUD", typeof(RectTransform));
-        canvasGo.layer = UiLayer;
-        SceneManager.MoveGameObjectToScene(canvasGo, scene);
-
-        var canvas = canvasGo.AddComponent<Canvas>();
-        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-        var scaler = canvasGo.AddComponent<CanvasScaler>();
-        scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-        scaler.referenceResolution = new Vector2(1920f, 1080f);
-
-        TextMeshProUGUI timer = Text(canvasGo.transform, "TimerText", "45", 72f,
-            new Vector2(1f, 1f), new Vector2(-40f, -30f), new Vector2(300f, 110f), TextAlignmentOptions.TopRight);
-        TextMeshProUGUI score = Text(canvasGo.transform, "ScoreText", "0 - 0", 56f,
-            new Vector2(0f, 1f), new Vector2(40f, -30f), new Vector2(400f, 110f), TextAlignmentOptions.TopLeft);
-
-        var panel = new GameObject("GameOverPanel", typeof(RectTransform));
-        panel.layer = UiLayer;
-        panel.transform.SetParent(canvasGo.transform, false);
-        var panelRect = panel.GetComponent<RectTransform>();
-        panelRect.anchorMin = Vector2.zero;
-        panelRect.anchorMax = Vector2.one;
-        panelRect.offsetMin = Vector2.zero;
-        panelRect.offsetMax = Vector2.zero;
-        panel.AddComponent<Image>().color = new Color(0f, 0f, 0f, 0.75f);
-
-        TextMeshProUGUI result = Text(panel.transform, "ResultText", "", 96f,
-            new Vector2(0.5f, 0.5f), new Vector2(0f, 60f), new Vector2(1200f, 160f), TextAlignmentOptions.Center);
-        Text(panel.transform, "HintText", "R ile yeniden basla", 40f,
-            new Vector2(0.5f, 0.5f), new Vector2(0f, -60f), new Vector2(1200f, 100f), TextAlignmentOptions.Center);
-
-        panel.SetActive(false);
-
-        var hud = canvasGo.AddComponent<MatchHud>();
-        hud.timerText = timer;
-        hud.scoreText = score;
-        hud.gameOverPanel = panel;
-        hud.resultText = result;
     }
 
-    static TextMeshProUGUI Text(Transform parent, string name, string content, float size,
-                                Vector2 anchor, Vector2 position, Vector2 box, TextAlignmentOptions align)
-    {
-        var go = new GameObject(name, typeof(RectTransform));
-        go.layer = UiLayer;
-        go.transform.SetParent(parent, false);
-
-        var rect = go.GetComponent<RectTransform>();
-        rect.anchorMin = anchor;
-        rect.anchorMax = anchor;
-        rect.pivot = anchor;
-        rect.anchoredPosition = position;
-        rect.sizeDelta = box;
-
-        var text = go.AddComponent<TextMeshProUGUI>();
-        text.text = content;
-        text.fontSize = size;
-        text.color = Color.white;
-        text.alignment = align;
-        return text;
-    }
-
-    // MatchHud yeniden baslatmak icin LoadScene kullaniyor, bu da sahnenin
-    // Build Settings'te olmasini gerektiriyor.
+    // Build Settings listesini GameFlowSetup yonetiyor; bu sadece
+    // DemoScene tek basina acilip test edilebilsin diye duruyor.
     static void AddSceneToBuildSettings()
     {
         if (EditorBuildSettings.scenes.Any(s => s.path == ScenePath && s.enabled)) return;

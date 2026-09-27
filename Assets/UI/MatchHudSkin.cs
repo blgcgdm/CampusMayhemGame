@@ -1,10 +1,9 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-// Furkan'ın MatchState'ini okuyan pixel art HUD + maç sonu ekranı.
-// Oyun mantığına dokunmaz: puan, süre ve bitiş MatchState'ten gelir.
-// Sahnede MatchHud varsa onun sade Canvas'ını gizler (MatchHud çalışmaya devam eder, R ile yeniden başlatma dahil).
+// MatchState'i okuyan pixel art HUD + maç sonu ekranı. Oyun mantığına
+// dokunmaz: puan, süre ve bitiş MatchState'ten gelir. Sahnedeki tek HUD
+// budur; eski sade MatchHud kaldırıldı.
 public class MatchHudSkin : MonoBehaviour
 {
     [Header("HUD")]
@@ -23,23 +22,12 @@ public class MatchHudSkin : MonoBehaviour
     public string[] playerNames = { "OYUNCU 1", "OYUNCU 2" };
     public Color[] playerColors = { new Color(0.95f, 0.36f, 0.4f), new Color(0.38f, 0.6f, 1f) };
     public Color lowTimeColor = new Color(1f, 0.35f, 0.3f);
-    public bool hideDefaultMatchHud = true;
-    public string menuSceneName = "";                 // boşsa Build Settings'teki ilk sahne
 
     bool shownEnd;
 
     void Start()
     {
         if (endScreen) endScreen.SetActive(false);
-        if (hideDefaultMatchHud)
-        {
-            var hud = FindFirstObjectByType<MatchHud>();
-            if (hud != null)
-            {
-                var c = hud.GetComponent<Canvas>();
-                if (c != null) c.enabled = false;
-            }
-        }
     }
 
     void Update()
@@ -87,14 +75,14 @@ public class MatchHudSkin : MonoBehaviour
         if (endScreen) endScreen.SetActive(true);
     }
 
+    // Tekrar oynamak ayni haritayi degil yeni bir rastgele harita yukluyor.
     public void Restart()
     {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        GameFlow.LoadRandomMap();
     }
 
     public void MainMenu()
     {
-        if (!string.IsNullOrEmpty(menuSceneName)) SceneManager.LoadScene(menuSceneName);
-        else SceneManager.LoadScene(0);
+        GameFlow.LoadMenu();
     }
 }
