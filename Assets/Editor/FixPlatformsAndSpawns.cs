@@ -20,6 +20,9 @@ public static class FixPlatformsAndSpawns
     };
     const string Holder = "PlatformColliders";
     const float Thickness = 0.25f;
+    // Karakterin çarpışma kutusu çiziminden dar; ayakları görsel olarak hâlâ platformdayken
+    // kutusu kenardan çıkıp düşüyordu. Şeritler her iki uçtan bu kadar uzatılır.
+    const float EdgeGrace = 0.3f;
 
     struct Surface { public float xMin, xMax, top; }
 
@@ -63,7 +66,7 @@ public static class FixPlatformsAndSpawns
                     {
                         Vector3 a = tm.CellToWorld(new Vector3Int(start, y, 0));
                         Vector3 c = tm.CellToWorld(new Vector3Int(x, y + 1, 0));
-                        var s = new Surface { xMin = a.x, xMax = c.x, top = c.y };
+                        var s = new Surface { xMin = a.x - EdgeGrace, xMax = c.x + EdgeGrace, top = c.y };
                         surfaces.Add(s);
 
                         var strip = new GameObject($"Surface_{y}_{start}_{x - 1}");
@@ -91,7 +94,7 @@ public static class FixPlatformsAndSpawns
                 if (sp == null) { Debug.LogError($"GameJam: {path} spawnpoint{i} yok"); continue; }
                 var p = sp.transform.position;
                 var surf = PickSurface(surfaces, p);
-                float x = Mathf.Clamp(p.x, surf.xMin + 0.6f, surf.xMax - 0.6f);
+                float x = Mathf.Clamp(p.x, surf.xMin + 0.9f, surf.xMax - 0.9f);
                 sp.transform.position = new Vector3(x, surf.top + 0.05f, 0f);
                 EditorUtility.SetDirty(sp.transform);
 
