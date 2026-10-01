@@ -585,6 +585,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MatchState
   matchDuration: 45
+  timerFrozen: 0
+  freezeKey: 282
 --- !u!4 &812155261
 Transform:
   m_ObjectHideFlags: 0
@@ -653,6 +655,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 3244735270063203036, guid: 927dbc7fc0f6f4b82bc5db59ba277a56, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4411014438682790859, guid: 927dbc7fc0f6f4b82bc5db59ba277a56, type: 3}
       propertyPath: m_Pivot.x
       value: 0

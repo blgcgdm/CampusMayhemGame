@@ -79,22 +79,22 @@ public class MatchHudSkin : MonoBehaviour
         // Beraberlikte kimseye puan yazilmiyor.
         if (!draw) PlayerProfiles.RecordWin(playerNames[first]);
 
-        ShowStandings();
+        //ShowStandings();
 
         if (endScreen) endScreen.SetActive(true);
     }
 
     // Genel tablo bitis ekraninda, tum oynanan maclarin birikimi.
-    void ShowStandings()
-    {
-        if (endScreen == null) return;
-
-        Text label = EnsureStandingsLabel();
-        var rows = PlayerProfiles.Standings().Take(6)
-            .Select(e => e.Key + "   " + e.Value);
-
-        label.text = "GENEL TABLO\n" + string.Join("\n", rows);
-    }
+    // void ShowStandings()
+    // {
+    //     if (endScreen == null) return;
+    //
+    //     Text label = EnsureStandingsLabel();
+    //     var rows = PlayerProfiles.Standings().Take(6)
+    //         .Select(e => e.Key + "   " + e.Value);
+    //
+    //     label.text = "GENEL TABLO\n" + string.Join("\n", rows);
+    // }
 
     // Prefab'a dokunmamak icin etiket calisma zamaninda uretiliyor.
     Text EnsureStandingsLabel()

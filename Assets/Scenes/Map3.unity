@@ -495,6 +495,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 7019732660108552126, guid: 78b80debfed464c8fb6e7a11a16006e6, type: 3}
+      propertyPath: spawnPoint
+      value: 
+      objectReference: {fileID: 1195369131}
     - target: {fileID: 7442602855664354550, guid: 78b80debfed464c8fb6e7a11a16006e6, type: 3}
       propertyPath: m_Name
       value: HeroKnight (1)
@@ -738,6 +742,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: LightBandit (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 8710304727507675893, guid: fef52a9f93f1148cfaeb16e2bfbe21a2, type: 3}
+      propertyPath: spawnPoint
+      value: 
+      objectReference: {fileID: 626403348}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -804,6 +812,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MatchState
   matchDuration: 45
+  timerFrozen: 0
+  freezeKey: 282
 --- !u!4 &1591208120
 Transform:
   m_ObjectHideFlags: 0
