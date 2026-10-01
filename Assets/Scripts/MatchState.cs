@@ -9,6 +9,10 @@ public class MatchState : MonoBehaviour
 
     [Header("Süre")]
     public float matchDuration = 45f;
+    
+    [Header("Test")]
+    public bool timerFrozen;
+    public KeyCode freezeKey = KeyCode.F1;
 
     public float TimeLeft { get; private set; }
     public bool IsRunning { get; private set; }
@@ -31,6 +35,11 @@ public class MatchState : MonoBehaviour
 
     void Update()
     {
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+        if (Input.GetKeyDown(freezeKey)) timerFrozen = !timerFrozen;
+        if (timerFrozen) return;
+#endif
+
         if (!IsRunning) return;
 
         TimeLeft -= Time.deltaTime;
@@ -46,9 +55,7 @@ public class MatchState : MonoBehaviour
         return scores.TryGetValue(playerIndex, out score) ? score : 0;
     }
 
-    // Haritadan dusen kim olursa olsun rakip puan alir. Iki kisilik bir
-    // oyunda "rakip" zaten tek kisi, o yuzden son-vuran takibine gerek yok;
-    // kendi hatanla dusmek de rakibe yariyor.
+    
     public void ReportRingOut(Fighter victim)
     {
         if (!IsRunning) return;

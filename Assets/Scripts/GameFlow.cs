@@ -2,9 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-// Sahne akisinin tek sahibi. Sahneler indeksle degil ISIMLE bulunuyor:
-// Build Settings'e Boot gibi yeni bir sahne eklemek tum indeksleri
-// kaydiriyor ve indekse gomulu mantik sessizce yanlis sahneyi aciyor.
+
 public static class GameFlow
 {
     public const string MenuScene = "MainMenu";
@@ -15,6 +13,11 @@ public static class GameFlow
     public static int MapCount
     {
         get { return MapNames().Count; }
+    }
+
+    public static bool IsMapScene(string sceneName)
+    {
+        return sceneName.StartsWith(MapPrefix);
     }
 
     public static void LoadMenu()
@@ -35,7 +38,6 @@ public static class GameFlow
         SceneManager.LoadScene(lastMap);
     }
 
-    // Ust uste ayni harita gelmesin. Tek harita varsa mecburen o.
     static string Pick(List<string> maps)
     {
         if (maps.Count == 1) return maps[0];
@@ -53,7 +55,7 @@ public static class GameFlow
         for (int i = 0; i < SceneManager.sceneCountInBuildSettings; i++)
         {
             string name = NameOf(SceneUtility.GetScenePathByBuildIndex(i));
-            if (name.StartsWith(MapPrefix)) names.Add(name);
+            if (IsMapScene(name)) names.Add(name);
         }
         return names;
     }

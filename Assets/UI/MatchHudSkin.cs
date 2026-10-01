@@ -2,9 +2,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
-// MatchState'i okuyan pixel art HUD + maç sonu ekranı. Oyun mantığına
-// dokunmaz: puan, süre ve bitiş MatchState'ten gelir. Sahnedeki tek HUD
-// budur; eski sade MatchHud kaldırıldı.
+
 public class MatchHudSkin : MonoBehaviour
 {
     [Header("HUD")]
@@ -18,7 +16,7 @@ public class MatchHudSkin : MonoBehaviour
     public Image[] rowMedals = new Image[2];
     public Text[] rowTexts = new Text[2];
     public Sprite goldMedal, silverMedal;
-    public Text standingsText;                        // bossa calisma zamaninda uretilir
+    public Text standingsText;                        
 
     [Header("Görünüm")]
     public string[] playerNames = { "OYUNCU 1", "OYUNCU 2" };

@@ -1,11 +1,13 @@
 using UnityEngine;
 
-// Her zaman buradan baslanir. Tek isi menuye gecmek; ileride kaydedilmis
-// ayar yuklemek gibi tek seferlik hazirliklar da buraya girer.
 public class Boot : MonoBehaviour
 {
+    [SerializeField] AudioClip menuMusic;
+    [SerializeField] AudioClip mapMusic;
+
     void Start()
     {
+        MusicManager.Create(menuMusic, mapMusic);
         GameFlow.LoadMenu();
     }
 }

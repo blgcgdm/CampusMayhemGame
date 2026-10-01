@@ -1735,6 +1735,7 @@ MonoBehaviour:
   - {fileID: 2165588236278915415}
   goldMedal: {fileID: 21300000, guid: e170539c7bc7d4ca3917c0a8e3555e65, type: 3}
   silverMedal: {fileID: 21300000, guid: 64eb018f8de7f417fb4a21af46379ddd, type: 3}
+  standingsText: {fileID: 0}
   playerNames:
   - OYUNCU 1
   - OYUNCU 2
