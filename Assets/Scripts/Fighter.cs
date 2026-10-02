@@ -105,7 +105,10 @@ public class Fighter : MonoBehaviour
 
         if (combat.IsStunned) return;
 
-        body.linearVelocity = new Vector2(moveInput * moveSpeed, body.linearVelocity.y);
+        float targetX = moveInput * moveSpeed;
+        float accel = IsGrounded ? 60f : 12f;
+        float newX = Mathf.MoveTowards(body.linearVelocity.x, targetX, accel * Time.fixedDeltaTime);
+        body.linearVelocity = new Vector2(newX, body.linearVelocity.y);
     }
 
     // MatchState yoksa (cıplak bir test sahnesi) dovusçu yine de calisir.
