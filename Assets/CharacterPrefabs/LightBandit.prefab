@@ -134,7 +134,7 @@ Rigidbody2D:
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
   m_Mass: 1
-  m_LinearDamping: 0.3
+  m_LinearDamping: 0
   m_AngularDamping: 0.05
   m_GravityScale: 1.6
   m_Material: {fileID: 0}
@@ -207,16 +207,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FighterCombat
   attackOffset: {x: 0.7, y: 0.1}
-  attackRadius: 0.7
-  attackCooldown: 0.35
+  attackRadius: 0.9
+  attackCooldown: 0.3
   fighterLayers:
     serializedVersion: 2
     m_Bits: 256
-  knockbackForce: 11
-  knockbackLift: 0.45
+  knockbackForce: 14
+  knockbackLift: 0.6
   stunDuration: 0.4
-  invulnerability: 0.4
-  maxKnockbackSpeed: 16
+  invulnerability: 0.2
+  maxKnockbackSpeed: 20
 --- !u!114 &8710304727507675893
 MonoBehaviour:
   m_ObjectHideFlags: 0
