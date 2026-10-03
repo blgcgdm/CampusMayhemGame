@@ -975,6 +975,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: MatchHudSkin
       objectReference: {fileID: 0}
+    - target: {fileID: 6897427632385951925, guid: 927dbc7fc0f6f4b82bc5db59ba277a56, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

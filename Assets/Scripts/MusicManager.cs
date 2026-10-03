@@ -9,6 +9,7 @@ public class MusicManager : MonoBehaviour
     AudioClip menuMusic;
     AudioClip mapMusic;
     AudioSource source;
+    [SerializeField] bool stopMusic;
 
     public static void Create(AudioClip menu, AudioClip map)
     {
@@ -50,4 +51,11 @@ public class MusicManager : MonoBehaviour
         source.clip = clip;
         source.Play();
     }
+    void Update()
+    {
+        if (stopMusic && source.isPlaying) source.Pause();
+        else if (!stopMusic && !source.isPlaying) source.UnPause();
+    }
+
+    
 }
